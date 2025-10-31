@@ -28,7 +28,7 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         queue = deque([start])
         while queue:
             current = queue.popleft()
-            for neigh in sorted(graph[current]):
+            for neigh in graph.get(current, []):
                 if neigh not in distances:
                     distances[neigh] = distances[current] + 1
                     queue.append(neigh)
@@ -46,15 +46,10 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         )
         target_gate = target_gates[0]
 
-        dist_to_gate = bfs(target_gate)
-
         neighbors = sorted(
             [neighbor for neighbor in graph[target_gate] if not neighbor.isupper()]
         )
-        false_neighbors = []
-        for neighbor in neighbors:
-            if neighbor in dist:
-                false_neighbors.append(neighbor)
+        false_neighbors = [neighbor for neighbor in neighbors if neighbor in dist]
 
         if not false_neighbors:
             gates.remove(target_gate)
@@ -66,15 +61,18 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         graph[target_gate].remove(node)
         graph[node].remove(target_gate)
 
+        dist_to_gate = bfs(target_gate)
+
         min_step = None
         min_step_dist = float("inf")
-        for to_node in sorted(graph[virus]):
+        for to_node in sorted(graph.get(virus, [])):
             if to_node in dist_to_gate and dist_to_gate[to_node] < min_step_dist:
                 min_step = to_node
                 min_step_dist = dist_to_gate[to_node]
 
         if min_step is None:
             break
+            
         virus = min_step
 
     return result
