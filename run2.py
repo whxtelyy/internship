@@ -59,7 +59,16 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         graph[target_gate].remove(neighbors[0])
         graph[neighbors[0]].remove(target_gate)
 
-        break
+        min_step = None
+        min_step_dist = float("inf")
+        for to_node in sorted(graph[virus]):
+            if to_node in dist:
+                if dist[to_node] < min_step_dist:
+                    min_step = to_node
+                    min_step_dist = dist[to_node]
+        if min_step is None:
+            break
+        virus = min_step
 
     return result
 
