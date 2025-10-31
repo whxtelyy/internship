@@ -28,7 +28,7 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         queue = deque([start])
         while queue:
             current = queue.popleft()
-            for neigh in graph.get(current, []):
+            for neigh in graph[current]:
                 if neigh not in distances:
                     distances[neigh] = distances[current] + 1
                     queue.append(neigh)
@@ -49,30 +49,45 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         neighbors = sorted(
             [neighbor for neighbor in graph[target_gate] if not neighbor.isupper()]
         )
-        false_neighbors = [neighbor for neighbor in neighbors if neighbor in dist]
-
-        if not false_neighbors:
-            gates.remove(target_gate)
+        if not neighbors:
+            if target_gate in gates:
+                gates.remove(target_gate)
             continue
 
-        node = false_neighbors[0]
-        result.append(f"{target_gate}-{node}")
+        result.append(f"{target_gate}-{neighbors[0]}")
 
-        graph[target_gate].remove(node)
-        graph[node].remove(target_gate)
+        graph[target_gate].remove(neighbors[0])
+        graph[neighbors[0]].remove(target_gate)
 
-        dist_to_gate = bfs(target_gate)
+        dist_to_node = bfs(virus)
+
+        reachable_gates_to_node = [gate for gate in gates if gate in dist_to_node]
+        if not reachable_gates_to_node:
+            break
+
+        min_dist_to_node = min(
+            dist_to_node[gate] for gate in reachable_gates_to_node
+        )
+
+        target_gates_to_node = sorted(
+            [gate for gate in reachable_gates_to_node
+             if dist_to_node[gate] == min_dist_to_node]
+        )
+
+        target_gate_to_node = target_gates_to_node[0]
+
+        gate_dist = bfs(target_gate_to_node)
 
         min_step = None
         min_step_dist = float("inf")
         for to_node in sorted(graph.get(virus, [])):
-            if to_node in dist_to_gate and dist_to_gate[to_node] < min_step_dist:
+            if to_node in gate_dist and gate_dist[to_node] < min_step_dist:
                 min_step = to_node
-                min_step_dist = dist_to_gate[to_node]
+                min_step_dist = gate_dist[to_node]
 
         if min_step is None:
             break
-            
+
         virus = min_step
 
     return result
