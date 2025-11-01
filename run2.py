@@ -138,7 +138,7 @@ def main():
 
     result = solve(edges)
     for edge in result:
-        print(edge)
+        print(edge
 
 
 if __name__ == "__main__":
