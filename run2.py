@@ -41,25 +41,28 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
             return None
 
         min_dist = min(dist_virus[gate_virus] for gate_virus in reachable_gates)
-        target_gates = sorted(
-            [
-                gate_virus
-                for gate_virus in reachable_gates
-                if dist_virus[gate_virus] == min_dist
-            ]
-        )
+        target_gates = [
+            gate_virus
+            for gate_virus in reachable_gates
+            if dist_virus[gate_virus] == min_dist
+        ]
         target_gate = sorted(target_gates)[0]
 
-        dist_gate = bfs(target_gate)
         neighbors = sorted(graph.get(position, []))
-        for neighbor in neighbors:
-            if (
-                neighbor not in dist_gate
-                and dist_gate[neighbor] == dist_gate[position] - 1
-            ):
-                return neighbor
+        best_neighbor = None
+        min_dist_gate = float("inf")
 
-        return neighbors[0] if neighbors else None
+        for neighbor in neighbors:
+            dist_neighbor = bfs(neighbor)
+            if target_gate in dist_neighbor:
+                distance = dist_neighbor[target_gate]
+                if distance < min_dist_gate or (
+                    distance == min_dist_gate and neighbor < dist_neighbor
+                ):
+                    min_dist_gate = distance
+                    best_neighbor = neighbor
+
+        return best_neighbor
 
     while True:
         next_move = find_virus(virus)
@@ -81,7 +84,7 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                 graph[gate].discard(node)
                 graph[node].discard(gate)
 
-                if not graph[node]:
+                if not graph[gate]:
                     gates.remove(gate)
             else:
                 break
