@@ -58,8 +58,8 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                 distance = dist_neighbor[target_gate]
                 if distance < min_dist_gate or (
                     distance == min_dist_gate
-                    and best_neighbor is None
-                    or neighbor < best_neighbor
+                    and (best_neighbor is None
+                    or neighbor < best_neighbor)
                 ):
                     min_dist_gate = distance
                     best_neighbor = neighbor
