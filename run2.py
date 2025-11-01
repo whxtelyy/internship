@@ -58,8 +58,8 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                 distance = dist_neighbor[target_gate]
                 if distance < min_dist_gate or (
                     distance == min_dist_gate
-                    and best_neighbor is None
-                    or neighbor < best_neighbor
+                    and (best_neighbor is None
+                    or neighbor < best_neighbor)
                 ):
                     min_dist_gate = distance
                     best_neighbor = neighbor
@@ -67,16 +67,15 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         return best_neighbor
 
     while True:
-        next_move = find_virus(virus)
-        if next_move is None:
-            break
+        corridor = False
+        possible_edges = []
 
-        if next_move in gates:
-            possible_edges = []
-            for gate in gates:
-                if virus in graph.get(gate, []):
-                    possible_edges.append(f"{gate}-{virus}")
+        for neighbour in sorted(graph.get(virus, [])):
+            if neighbour in gates:
+                corridor = True
+                possible_edges.append(f"{neighbour}-{virus}")
 
+        if corridor:
             possible_edges.sort()
             if possible_edges:
                 best_edge = possible_edges[0]
@@ -98,19 +97,23 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                     if node.islower():
                         possible_edges.append(f"{gate}-{node}")
 
-            possible_edges.sort()
-            if possible_edges:
-                best_edge = possible_edges[0]
-                result.append(best_edge)
-
-                gate, node = best_edge.split("-")
-                graph[gate].discard(node)
-                graph[node].discard(gate)
-
-                if not graph[gate]:
-                    gates.remove(gate)
-            else:
+            if not possible_edges:
                 break
+
+            possible_edges.sort()
+            best_edge = possible_edges[0]
+            result.append(best_edge)
+
+            gate, node = best_edge.split("-")
+            graph[gate].discard(node)
+            graph[node].discard(gate)
+
+            if not graph[gate]:
+                gates.remove(gate)
+
+        next_move = find_virus(virus)
+        if next_move is None:
+            break
 
         virus = next_move
 
