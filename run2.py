@@ -34,13 +34,13 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
 
     def find_virus(position):
         dist_virus = bfs(position)
-        reachable_gates = [gate for gate in gates if gate in dist_virus]
+        reachable_gates = [gate_virus for gate_virus in gates if gate_virus in dist_virus]
         if not reachable_gates:
             return None
 
-        min_dist = min(dist_virus[gate] for gate in reachable_gates)
+        min_dist = min(dist_virus[gate_virus] for gate_virus in reachable_gates)
         target_gates = sorted(
-            [gate for gate in reachable_gates if dist_virus[gate] == min_dist]
+            [gate_virus for gate_virus in reachable_gates if dist_virus[gate_virus] == min_dist]
         )
         target_gate = sorted(target_gates)[0]
 
